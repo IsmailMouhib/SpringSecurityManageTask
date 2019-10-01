@@ -37,7 +37,7 @@ public class JWTAuthentificationFilter extends UsernamePasswordAuthenticationFil
         } catch (Exception e) {
             throw  new RuntimeException(e);
         }
-        System.out.println("*****************************");
+        System.out.println("********** attemptAuthentication *******************");
         System.out.println("Username : "+ user.getUsername());
         // retourner a spring un objet de type authentication
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getUsername(),user.getPassword()));
@@ -55,6 +55,8 @@ public class JWTAuthentificationFilter extends UsernamePasswordAuthenticationFil
                 signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET).
                 claim("roles", springUser.getAuthorities()).
                 compact();
+        System.out.println("********** successfulAuthentication *******************");
+        System.out.println("JWT Authorezation berear : "+ jwt);
         response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PRIFIXE + jwt);
     }
 }
