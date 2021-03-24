@@ -47,7 +47,7 @@ public class AppUser {
         this.username = username;
     }
 
-    @JsonIgnore
+    @JsonIgnore // pour ne pas remonter le password au user, danger de hack
     public String getPassword() {
         return password;
     }

@@ -33,7 +33,7 @@ public class JWTAuthentificationFilter extends UsernamePasswordAuthenticationFil
 
             // prendre le flux json et le mettre dans l objet user
         try {
-            user = new ObjectMapper().readValue(request.getInputStream(), AppUser.class);
+            user = new ObjectMapper().readValue(request.getInputStream(), AppUser.class); // cast json to object
         } catch (Exception e) {
             throw  new RuntimeException(e);
         }
@@ -56,7 +56,8 @@ public class JWTAuthentificationFilter extends UsernamePasswordAuthenticationFil
                 claim("roles", springUser.getAuthorities()).
                 compact();
         System.out.println("********** successfulAuthentication *******************");
-        System.out.println("JWT Authorezation berear : "+ jwt);
+        System.out.println("JWT Authorization berear : "+ jwt);
+        // key = Authorization , value = Bearer jwt
         response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PRIFIXE + jwt);
     }
 }

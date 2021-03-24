@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 // centraliser la gestion des users et roles
-public class AccountServiceImpl implements  AccountService {
+public class AccountServiceImpl implements AccountService {
 
     @Autowired
     BCryptPasswordEncoder bCryptPasswordEncoder;

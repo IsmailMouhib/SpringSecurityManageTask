@@ -35,22 +35,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
          */
         /*auth.jdbcAuthentication().usersByUsernameQuery("")
                 .authoritiesByUsernameQuery("").passwordEncoder() */
-        // on delegue le traitement à une couche de service
+        // on delegue le traitement à une couche de service (interface de spring security UserDetailsService)
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        //desactiver le mode session utilise par spring security
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-        //http.formLogin();
-        // ca ne cessite pas l authrntification
-        http.authorizeRequests().antMatchers("/login/**","/register/**").permitAll();
-        http.authorizeRequests().antMatchers(HttpMethod.POST, "/tasks/**").hasAuthority("ADMIN");
+        http.csrf().disable(); // spring génére par defaut CSRF hidden dans l input deu formulaire le synchronize tokencontre les attaques CROSS SITE FORGERY (on le desactive si on utlise JWT)
+        http.headers().frameOptions().disable(); // for deblock H2-Console is not showing in browser
+
+        //desactiver le mode session utilise par spring security car par défaut spring utilise l'authenticatin via les sessions
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // don't create session, on va passer d'un passage par referenece qui est session au passage par valeur jwt car tt ce trouve dans ce dernier
+
+        //http.formLogin(); // formulaire par defaut d authentication de spring
+
+        // le formulaire d authentification ne cessite pas une authority
+        http.authorizeRequests().antMatchers("/login/**","/register/**","/h2-console/**").permitAll();
+        http.authorizeRequests().antMatchers(HttpMethod.POST, "/tasks/**").hasAuthority("ADMIN");// seulement l ADMIN QUI PEUT AJOUTER des taches
+
         // toutes les requetes necessites une authentification
         http.authorizeRequests().anyRequest().authenticated();
+
+        // Ajouter le filter d authentication
         http.addFilter(new JWTAuthentificationFilter(authenticationManager()));
+
+        // Ajouter le filter d authorisation ==  ce filtre s execute pour chaque requete
         http.addFilterBefore(new JWTAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
